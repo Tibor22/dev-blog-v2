@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FC, useLayoutEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import Logo from './Logo';
 import { RiMenuFoldFill, RiMenuUnfoldFill } from 'react-icons/ri';
 import { IconType } from 'react-icons/lib/esm/iconBase';
@@ -10,7 +10,7 @@ interface Props {
 
 const AdminNav: FC<Props> = ({ navItems }): JSX.Element => {
 	const [visible, setVisible] = useState<boolean | null>(null);
-	useLayoutEffect(() => {
+	useEffect(() => {
 		const storedNavOpen = localStorage.getItem('navOpen');
 		setVisible((storedNavOpen === 'false' ? false : true) || false);
 	}, []);
