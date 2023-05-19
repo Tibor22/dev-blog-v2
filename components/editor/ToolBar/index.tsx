@@ -18,6 +18,8 @@ import {
 	BsLink45Deg,
 	BsYoutube,
 } from 'react-icons/bs';
+import InsertLink from '../Link/InsertLink';
+import { linkOption } from '../Link/LinkForm';
 
 interface Props {
 	editor: Editor | null;
@@ -59,6 +61,14 @@ const ToolBar: FC<Props> = ({ editor }): JSX.Element | null => {
 		if (editor.isActive('heading', { level: 2 })) return 'Heading 2';
 		if (editor.isActive('heading', { level: 3 })) return 'Heading 3';
 		return 'Paragraph';
+	};
+
+	const handleLinkSubmit = ({ url, openInNewTab }: linkOption) => {
+		console.log('URL:', url);
+		editor.commands.setLink({
+			href: url,
+			...(openInNewTab && { target: '_blank' }),
+		});
 	};
 
 	return (
@@ -111,9 +121,7 @@ const ToolBar: FC<Props> = ({ editor }): JSX.Element | null => {
 				>
 					<BsBraces />
 				</Button>
-				<Button>
-					<BsLink45Deg />
-				</Button>
+				<InsertLink onSubmit={handleLinkSubmit} />
 				<Button
 					active={editor.isActive('orderedList')}
 					onClick={() => getFocusedEditor(editor).toggleOrderedList().run()}
