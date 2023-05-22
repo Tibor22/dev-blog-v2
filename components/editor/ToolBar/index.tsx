@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, SetStateAction } from 'react';
 import { Editor } from '@tiptap/react';
 import DropdownOptions from '@/components/common/DropDownOptions';
 import { getFocusedEditor } from '../EditorUtils';
@@ -15,17 +15,20 @@ import {
 	BsTypeItalic,
 	BsTypeUnderline,
 	BsImageFill,
-	BsLink45Deg,
-	BsYoutube,
 } from 'react-icons/bs';
 import InsertLink from '../Link/InsertLink';
 import { linkOption } from '../Link/LinkForm';
+import EmbedYoutube from './EmbedYoutube';
 
 interface Props {
 	editor: Editor | null;
+	onOpenImageClick?(): void;
 }
 
-const ToolBar: FC<Props> = ({ editor }): JSX.Element | null => {
+const ToolBar: FC<Props> = ({
+	editor,
+	onOpenImageClick,
+}): JSX.Element | null => {
 	if (!editor) return null;
 
 	const options = [
@@ -69,6 +72,10 @@ const ToolBar: FC<Props> = ({ editor }): JSX.Element | null => {
 			href: url,
 			...(openInNewTab && { target: '_blank' }),
 		});
+	};
+
+	const handleEmbedYoutube = (url: string) => {
+		editor.chain().focus().setYoutubeVideo({ src: url }).run();
 	};
 
 	return (
@@ -137,10 +144,8 @@ const ToolBar: FC<Props> = ({ editor }): JSX.Element | null => {
 			</div>
 			<div className='h-4 w-[1px] bg-secondary-dark dark:bg-secondary-light mx-8' />
 			<div className='flex items-center space-x-3'>
-				<Button>
-					<BsYoutube />
-				</Button>
-				<Button>
+				<EmbedYoutube onSubmit={handleEmbedYoutube} />
+				<Button onClick={onOpenImageClick}>
 					<BsImageFill />
 				</Button>
 			</div>

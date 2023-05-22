@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { validateUrl } from '../EditorUtils';
 
 interface Props {
@@ -27,6 +27,9 @@ const LinkForm: FC<Props> = ({
 	const [url, setUrl] = useState('');
 	const [openInNewTab, setOpenInNewTab] = useState(false);
 	const [link, setLink] = useState<linkOption>(defaultLink);
+	useEffect(() => {
+		if (initialState) setLink({ ...initialState });
+	}, [initialState]);
 
 	if (!visible) return null;
 
@@ -35,8 +38,7 @@ const LinkForm: FC<Props> = ({
 		onSubmit({ ...link, url: validateUrl(link.url) });
 		setLink(defaultLink);
 	};
-
-	console.log('LINK:', link);
+	console.log('INITIAL STATE:', initialState);
 
 	return (
 		<div className='rounded text-left bg-primary dark:bg-primary-dark animate-reveal z-50 dark:shadow-secondary-dark shadow-md p-2'>

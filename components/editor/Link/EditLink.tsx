@@ -1,32 +1,81 @@
-import { FC } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { BsBoxArrowUpRight, BsPencilSquare } from 'react-icons/bs';
 import { BiUnlink } from 'react-icons/bi';
+import { BubbleMenu, Editor } from '@tiptap/react';
+import LinkForm, { linkOption } from './LinkForm';
 
-interface Props {}
+interface Props {
+	editor: Editor;
+}
 
-const EditLink: FC<Props> = (): JSX.Element => {
-	const handleOnLinkOpenClick = () => {};
+const EditLink: FC<Props> = ({ editor }: Props): JSX.Element => {
+	const [showEditForm, setShowEditForm] = useState(false);
 
-	const handleLinkEditClick = () => {};
+	const handleOnLinkOpenClick = useCallback(() => {
+		const { href } = editor.getAttributes('link');
 
-	const handleUnlinkClick = () => {};
+		if (href) {
+			window.open(href, '_blank');
+		}
+	}, [editor]);
+
+	const handleLinkEditClick = () => {
+		setShowEditForm(true);
+	};
+
+	const handleUnlinkClick = () => {
+		editor.commands.unsetLink();
+	};
+
+	const handleSubmit = ({ url, openInNewTab }: linkOption) => {
+		editor
+			.chain()
+			.focus()
+			.unsetLink()
+			.setLink({ href: url, target: openInNewTab ? '_blank' : '' })
+			.run();
+		setShowEditForm(false);
+	};
+
+	const getInitialState = useCallback(() => {
+		const { href, target } = editor.getAttributes('link');
+
+		return { url: href, openInNewTab: target ? true : false };
+	}, [editor]);
 
 	return (
-		<div>
-			<div className='rounded bg-primary dark:bg-primary-dark text-primary-dark dark:text-primary shadow-secondary-dark shadow-md p-3 flex items-center space-x-6 z-50'>
-				<button onClick={handleOnLinkOpenClick}>
-					<BsBoxArrowUpRight />
-				</button>
+		<BubbleMenu
+			shouldShow={({ editor }) => {
+				return editor.isActive('link');
+			}}
+			editor={editor}
+			tippyOptions={{
+				onHide: () => {
+					setShowEditForm(false);
+				},
+			}}
+		>
+			<LinkForm
+				visible={showEditForm}
+				onSubmit={handleSubmit}
+				initialState={getInitialState()}
+			/>
+			{!showEditForm && (
+				<div className='rounded bg-primary dark:bg-primary-dark text-primary-dark dark:text-primary shadow-secondary-dark shadow-md p-3 flex items-center space-x-6 z-50 relative'>
+					<button onClick={handleOnLinkOpenClick}>
+						<BsBoxArrowUpRight />
+					</button>
 
-				<button onClick={handleLinkEditClick}>
-					<BsPencilSquare />
-				</button>
+					<button onClick={handleLinkEditClick}>
+						<BsPencilSquare />
+					</button>
 
-				<button onClick={handleUnlinkClick}>
-					<BiUnlink />
-				</button>
-			</div>
-		</div>
+					<button onClick={handleUnlinkClick}>
+						<BiUnlink />
+					</button>
+				</div>
+			)}
+		</BubbleMenu>
 	);
 };
 
