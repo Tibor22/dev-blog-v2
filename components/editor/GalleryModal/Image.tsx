@@ -10,7 +10,10 @@ interface Props {
 
 const Image: FC<Props> = ({ src, selected, onClick }): JSX.Element => {
 	return (
-		<div className='relative h-[200px] w-[200px] first-line:rounded overflow-hidden cursor-pointer'>
+		<div
+			onClick={onClick}
+			className='relative h-[200px] w-[200px] first-line:rounded overflow-hidden cursor-pointer'
+		>
 			<NextImage
 				style={{ objectFit: 'cover' }}
 				fill
