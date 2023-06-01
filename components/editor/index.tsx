@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { ChangeEventHandler, FC, useEffect, useState } from 'react';
 import { useEditor, EditorContent, getMarkRange, Range } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import ToolBar from './ToolBar';
@@ -11,14 +11,31 @@ import EditLink from './Link/EditLink';
 import GalleryModal from './GalleryModal';
 import { ImageSelectionResult } from './GalleryModal';
 import axios from 'axios';
-import SEOForm from './SEOForm';
-interface Props {}
+import SEOForm, { SeoResult } from './SEOForm';
+import ActionButton from '../common/ActionButton';
+import ThumbnailSelector from './ThumbnailSelector';
 
-const Editor: FC<Props> = (props): JSX.Element => {
+interface FinalPost extends SeoResult {
+	title: string;
+	content: String;
+	thumbnail?: File | string;
+}
+interface Props {
+	onSubmit(post: FinalPost): void;
+}
+
+const Editor: FC<Props> = ({ onSubmit }): JSX.Element => {
 	const [selectionRange, setSelectionRange] = useState<Range>();
 	const [showGallery, setShowGallery] = useState(false);
 	const [images, setImages] = useState<{ src: string }[]>([]);
 	const [uploading, setUploading] = useState(false);
+	const [post, setPost] = useState<FinalPost>({
+		title: '',
+		content: '',
+		meta: '',
+		tags: '',
+		slug: '',
+	});
 
 	const fetchImages = async () => {
 		const { data } = await axios('/api/image');
@@ -73,7 +90,7 @@ const Editor: FC<Props> = (props): JSX.Element => {
 			},
 			attributes: {
 				class:
-					'prose prose-lg prose-p:leading-4 focus:outline-none dark:prose-invert max-w-full mx-auto h-full',
+					'prose prose-lg focus:outline-none dark:prose-invert max-w-full mx-auto h-full',
 			},
 		},
 	});
@@ -95,28 +112,47 @@ const Editor: FC<Props> = (props): JSX.Element => {
 		fetchImages();
 	}, []);
 
+	const updateTitle: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
+		setPost((prevPost) => ({ ...prevPost, title: target.value }));
+	};
+	const updateSEOValue = (result: SeoResult) => {
+		setPost((prevPost) => ({ ...prevPost, ...result }));
+	};
+	const updateThumbnail = (file: File) => {
+		setPost((prevPost) => ({ ...prevPost, thumbnail: file }));
+	};
+
+	const handleSubmit = () => {
+		if (!editor) return;
+		onSubmit({ ...post, content: editor.getHTML() });
+	};
+
 	return (
 		<>
 			<div className='p-3 dark:bg-primary-dark bg-primary transition'>
-				<input
-					type='text'
-					placeholder='Title'
-					className=' py-2 outline-none bg-transparent w-full border-0 border-b-[1px] border-secondary-dark dark:border-secondary-light text-3xl font-semibold italic text-primary-dark dark:text-primary mb-3'
-				/>
-				<ToolBar
-					editor={editor}
-					onOpenImageClick={() => setShowGallery(true)}
-				/>
-				<div className='h-[1px] w-full bg-secondary-dark dark:bg-secondary-light my-3'></div>
+				<div className='sticky top-0 z-10 dark:bg-primary-dark bg-primary'>
+					<div className='flex items-center justify-between mb-3'>
+						<ThumbnailSelector onChange={updateThumbnail} />
+						<div className='inline-block'>
+							<ActionButton onClick={handleSubmit} title='Submit' />
+						</div>
+					</div>
+					<input
+						onChange={updateTitle}
+						type='text'
+						placeholder='Title'
+						className=' py-2 outline-none bg-transparent w-full border-0 border-b-[1px] border-secondary-dark dark:border-secondary-light text-3xl font-semibold italic text-primary-dark dark:text-primary mb-3'
+					/>
+					<ToolBar
+						editor={editor}
+						onOpenImageClick={() => setShowGallery(true)}
+					/>
+					<div className='h-[1px] w-full bg-secondary-dark dark:bg-secondary-light my-3'></div>
+				</div>
 				{editor ? <EditLink editor={editor} /> : null}
 				<EditorContent editor={editor} className='min-h-[300px]' />
 				<div className='h-[1px] w-full bg-secondary-dark dark:bg-secondary-light my-3'></div>
-				<SEOForm
-					onChange={(result) => {
-						console.log(result);
-					}}
-					title={'This is my title'}
-				/>
+				<SEOForm onChange={updateSEOValue} title={post.title} />
 			</div>
 			{showGallery && (
 				<GalleryModal

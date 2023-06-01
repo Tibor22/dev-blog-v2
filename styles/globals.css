@@ -1,22 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.ProseMirror {
-	> * + * {
-		margin-top: 0.75em;
-	}
-}
-
-.custom-scroll-bar::-webkit-scrollbar {
-	width: 4px;
-	height: 4px;
-}
-.custom-scroll-bar::-webkit-scrollbar-thumb {
-	background: rgb(202, 181, 2269);
-}
-
-/* Placeholder (at the top) */
 .ProseMirror p.is-editor-empty:first-child::before {
 	color: #adb5bd;
 	content: attr(data-placeholder);
@@ -24,3 +5,18 @@
 	height: 0;
 	pointer-events: none;
 }
+
+/*custom scroll css*/
+.custom-scroll-bar::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+/* Handle */
+.custom-scroll-bar::-webkit-scrollbar-thumb {
+	background: rgb(202, 181, 226);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
