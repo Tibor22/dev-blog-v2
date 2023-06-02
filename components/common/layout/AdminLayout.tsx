@@ -11,9 +11,10 @@ import Link from 'next/link';
 
 interface Props {
 	children: ReactNode;
+	title?: string;
 }
 
-const AdminLayout: FC<Props> = ({ children }): JSX.Element => {
+const AdminLayout: FC<Props> = ({ children, title }): JSX.Element => {
 	const navItems = [
 		{ href: '/admin', icon: AiOutlineDashboard, label: 'Dashboard' },
 		{ href: '/admin/posts', icon: AiOutlineContainer, label: 'Posts' },
