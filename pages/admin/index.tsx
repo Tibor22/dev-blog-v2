@@ -3,12 +3,12 @@ import { NextPage } from 'next';
 
 interface Props {}
 
-const Admin: NextPage<Props> = () => {
+const Update: NextPage<Props> = () => {
 	return (
 		<AdminLayout>
-			<div>This is Admin</div>
+			<div>This is Update</div>
 		</AdminLayout>
 	);
 };
 
-export default Admin;
+export default Update;
